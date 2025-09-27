@@ -8,5 +8,59 @@
 			<img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNTA3MDNfMTk1%2FMDAxNzUxNTAyNDc0NjQw.gbsC8y6L8wDaSSuUmm3RLouPdpeX0wudat2lzHGK_mgg._awhHPtxSRF4cVZAJXu4kMCaLGk_IbXei8oBBk_4L5cg.JPEG%2F20250405%25A3%25DF132043.jpg&type=sc960_832" alt="마이멜로디">
 			<figcaption><h1>🌸귀여운 벚꽃 마이멜로디의 모습🌸</h1></figcaption>
 		</figure>
+		import svgPaths from "./svg-aly743ci40";
+
+function LeftLogo() {
+  return (
+    <div className="h-[149.864px] relative shrink-0 w-[149.866px]" data-name="Left Logo">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 150 150">
+        <g id="Left Logo">
+          <path d={svgPaths.p3dfb3280} fill="var(--fill-0, black)" id="Left Logo_2" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function RightLogo() {
+  return (
+    <div className="relative shrink-0 size-[150.123px]" data-name="Right logo">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 151 151">
+        <g id="Right logo">
+          <path d={svgPaths.p3d95e600} fill="var(--fill-0, black)" id="Right logo_2" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function LogoContain() {
+  return (
+    <div className="basis-0 content-stretch flex gap-[8px] grow items-start min-h-px min-w-px relative shrink-0" data-name="Logo contain">
+      <LeftLogo />
+      <RightLogo />
+    </div>
+  );
+}
+
+function NavContain() {
+  return (
+    <div className="box-border content-stretch flex gap-[20px] items-start pb-[10px] pt-[50px] px-0 relative shrink-0 w-full" data-name="Nav contain">
+      <LogoContain />
+    </div>
+  );
+}
+
+export default function NavSection() {
+  return (
+    <div className="bg-white relative size-full" data-name="Nav section">
+      <div className="relative size-full">
+        <div className="box-border content-stretch flex flex-col gap-[10px] items-start pb-0 pt-[15px] px-[15px] relative size-full">
+          <NavContain />
+        </div>
+      </div>
+    </div>
+  );
+}
 	</body>
 </html>
