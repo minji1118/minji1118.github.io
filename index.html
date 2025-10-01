@@ -15,6 +15,17 @@
   <button onclick="callAPI()">API 호출하기</button>
   <p id="result">결과가 여기에 표시됩니다.</p>
 
+			 <h1>주문</h1>
+    <input id="book_title" placeholder="책 제목">
+    <input id="amount" type="number" placeholder="수량">
+    <button onclick="order()">주문</button>
+
+    <h1>북뷰어</h1>
+    <input id="filename" placeholder="파일명 (book1.pdf)">
+    <button onclick="viewBook()">보기</button>
+    <iframe id="viewer" width="600" height="400"></iframe>
+
+	
   <script>
     async function callAPI() {
       const res = await fetch('/api/hello');
@@ -22,6 +33,30 @@
       document.getElementById('result').innerText = data.message;
     }
   </script>
+
+		 <script>
+        const user_id = 1; // 로그인 후 실제 user_id로 대체
+
+        function order() {
+            const book_title = document.getElementById("book_title").value;
+            const amount = document.getElementById("amount").value;
+
+            fetch("/order", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({user_id, book_title, amount})
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message));
+        }
+
+        function viewBook() {
+            const book_title = document.getElementById("book_title").value;
+            const filename = document.getElementById("filename").value;
+            const url = `/view/${user_id}/${book_title}/${filename}`;
+            document.getElementById("viewer").src = url;  // iframe으로 PDF/이미지 표시
+        }
+    </script>
 
 	</body>
 </html>
