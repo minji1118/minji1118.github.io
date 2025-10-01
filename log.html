@@ -1,0 +1,43 @@
+C:/Users/minji1118/Documents/minji1118.github.io/index.htm
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>주문 & 북뷰어</title>
+</head>
+<body>
+    <h1>주문</h1>
+    <input id="book_title" placeholder="책 제목">
+    <input id="amount" type="number" placeholder="수량">
+    <button onclick="order()">주문</button>
+
+    <h1>북뷰어</h1>
+    <input id="filename" placeholder="파일명 (book1.pdf)">
+    <button onclick="viewBook()">보기</button>
+    <iframe id="viewer" width="600" height="400"></iframe>
+
+    <script>
+        const user_id = 1; // 로그인 후 실제 user_id로 대체
+
+        function order() {
+            const book_title = document.getElementById("book_title").value;
+            const amount = document.getElementById("amount").value;
+
+            fetch("/order", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({user_id, book_title, amount})
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message));
+        }
+
+        function viewBook() {
+            const book_title = document.getElementById("book_title").value;
+            const filename = document.getElementById("filename").value;
+            const url = `/view/${user_id}/${book_title}/${filename}`;
+            document.getElementById("viewer").src = url;  // iframe으로 PDF/이미지 표시
+        }
+    </script>
+</body>
+</html>
