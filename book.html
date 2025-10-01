@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로그인</title>
+</head>
+<body>
+<h1>로그인</h1>
+<input id="username" placeholder="아이디">
+<input id="password" type="password" placeholder="비밀번호">
+<button onclick="login()">로그인</button>
+<p id="msg"></p>
+<p><a href="/signup_page">회원가입</a></p>
+
+<script>
+function login(){
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch("/login", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username, password})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("msg").innerText = data.message;
+        if(data.user_id){
+            setTimeout(()=>{window.location.href="/"}, 500);
+        }
+    });
+}
+</script>
+</body>
+</html>
