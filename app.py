@@ -4,6 +4,10 @@ import mysql.connector
 app = Flask(__name__)
 app.secret_key = "mysecret"  # 세션 암호화용 키
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 # ✅ MySQL 연결 설정
 db = mysql.connector.connect(
     host="localhost",      # Render에 올릴 때는 DB 호스트 주소 입력
@@ -67,3 +71,4 @@ def get_orders():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
