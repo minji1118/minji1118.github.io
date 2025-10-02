@@ -1,0 +1,21 @@
+<h2>북뷰어</h2>
+<div id="page1" style="display:block;">
+    <p>📖 1페이지 내용</p>
+    <button onclick="nextPage()">다음 페이지</button>
+</div>
+<div id="page2" style="display:none;">
+    <p>📖 2페이지 내용</p>
+    <button onclick="prevPage()">이전 페이지</button>
+</div>
+
+<script>
+function nextPage(){
+    document.getElementById("page1").style.display="none";
+    document.getElementById("page2").style.display="block";
+}
+function prevPage(){
+    document.getElementById("page1").style.display="block";
+    document.getElementById("page2").style.display="none";
+}
+</script>
+<a href="/">메인으로</a>
