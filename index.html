@@ -1,26 +1,18 @@
 <!DOCTYPE html>
-<html lang="ko">
-	<head>
-		<title> HTML 테스트 </title>
-	</head>
-	<body>
-		<figure>
-			<img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNTA3MDNfMTk1%2FMDAxNzUxNTAyNDc0NjQw.gbsC8y6L8wDaSSuUmm3RLouPdpeX0wudat2lzHGK_mgg._awhHPtxSRF4cVZAJXu4kMCaLGk_IbXei8oBBk_4L5cg.JPEG%2F20250405%25A3%25DF132043.jpg&type=sc960_832" alt="마이멜로디">
-			<figcaption><h1>🌸귀여운 벚꽃 마이멜로디의 모습🌸</h1></figcaption>
-			<img src="image.png" alt="피그마 디자인">
-		</figure>
-	
-  <h1>Netlify + API 연동</h1>
-
-  <button onclick="callAPI()">API 호출하기</button>
-  <p id="result">결과가 여기에 표시됩니다.</p>
-
-  <script>
-    async function callAPI() {
-      const res = await fetch('/api/hello');
-      const data = await res.json();
-      document.getElementById('result').innerText = data.message;
-    }
-  </script>
-	</body>
+<html>
+<head>
+    <title>메인</title>
+</head>
+<body>
+    <h1>📚 온라인 서점</h1>
+    {% if logged_in %}
+        <p>환영합니다, {{ session['username'] }}님!</p>
+        <a href="/books">책 목록</a> |
+        <a href="/viewer">북뷰어</a> |
+        <a href="/logout">로그아웃</a>
+    {% else %}
+        <a href="/login">로그인</a> |
+        <a href="/register">회원가입</a>
+    {% endif %}
+</body>
 </html>
