@@ -1,74 +1,111 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "mysecret"  # 세션 암호화용 키
+app.secret_key = "mysecretkey"  # 세션용 키
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# DB 연결
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="비밀번호입력",  # ← 본인 MySQL 비밀번호
+        database="bookstore"
+    )
 
-# ✅ MySQL 연결 설정
-db = mysql.connector.connect(
-    host="localhost",      # Render에 올릴 때는 DB 호스트 주소 입력
-    user="root",           # MySQL 사용자 이름
-    password="0000",       # MySQL 비밀번호
-    database="bookshop"    # 사용할 데이터베이스 이름
-)
-cursor = db.cursor(dictionary=True)
+# 메인 페이지
+@app.route("/")
+def index():
+    logged_in = "user_id" in session
+    return render_template("index.html", logged_in=logged_in)
 
-# ✅ 회원가입
-@app.route("/register", methods=["POST"])
+# 회원가입
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    data = request.json
-    username = data["username"]
-    password = data["password"]
+    if request.method == "POST":
+        username = request.form["username"]
+        password = generate_password_hash(request.form["password"])
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+            conn.commit()
+        except:
+            return "회원가입 실패 (중복 ID)"
+        cursor.close()
+        conn.close()
+        return redirect(url_for("index"))
+    return render_template("register.html")
 
-    cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
-    db.commit()
-    return jsonify({"message": "회원가입 완료!"})
-
-# ✅ 로그인
-@app.route("/login", methods=["POST"])
+# 로그인
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    data = request.json
-    username = data["username"]
-    password = data["password"]
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-    cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
-    user = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-    if user:
-        session["user_id"] = user["id"]
-        return jsonify({"message": "로그인 성공!"})
-    else:
-        return jsonify({"message": "로그인 실패"}), 401
+        if user and check_password_hash(user["password"], password):
+            session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            return redirect(url_for("index"))
+        else:
+            return "로그인 실패"
+    return render_template("login.html")
 
-# ✅ 주문하기
-@app.route("/order", methods=["POST"])
-def order():
+# 로그아웃
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
+
+# 책 목록
+@app.route("/books")
+def books():
     if "user_id" not in session:
-        return jsonify({"message": "로그인 먼저 하세요"}), 403
+        return redirect(url_for("login"))
 
-    data = request.json
-    book_title = data["book_title"]
-    amount = data["amount"]
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM books")
+    book_list = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template("booklist.html", books=book_list)
 
-    cursor.execute("INSERT INTO orders (user_id, book_title, amount) VALUES (%s, %s, %s)",
-                   (session["user_id"], book_title, amount))
-    db.commit()
-    return jsonify({"message": "주문 완료!"})
-
-# ✅ 주문 목록 보기
-@app.route("/orders", methods=["GET"])
-def get_orders():
+# 책 구매
+@app.route("/buy/<int:book_id>")
+def buy(book_id):
     if "user_id" not in session:
-        return jsonify({"message": "로그인 먼저 하세요"}), 403
+        return redirect(url_for("login"))
 
-    cursor.execute("SELECT * FROM orders WHERE user_id=%s", (session["user_id"],))
-    orders = cursor.fetchall()
-    return jsonify(orders)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT price FROM books WHERE id=%s", (book_id,))
+    price = cursor.fetchone()[0]
+
+    cursor.execute("INSERT INTO sales (book_id, user_id, quantity, total_price) VALUES (%s, %s, %s, %s)",
+                   (book_id, session["user_id"], 1, price))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    return "구매 완료!"
+
+# 북뷰어
+@app.route("/viewer")
+def viewer():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    return render_template("viewer.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
-
